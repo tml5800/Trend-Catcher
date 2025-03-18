@@ -25,5 +25,7 @@
 ### 📥 Steps
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/yourusername/trend-catchers.git
-   cd trend-catchers
+   git clone [https://github.com/yourusername/trend-catchers.git
+   cd trend-catchers}
+
+   (https://symmetrical-giggle-q7p765vw9gx4c4994.github.dev/)
