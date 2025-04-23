@@ -27,3 +27,9 @@
    ```sh
    git clone https://github.com/yourusername/trend-catchers.git
    cd trend-catchers
+
+
+python3 -m http.server 8080
+
+https://verbose-waffle-v6q6wjpxg5x4fxwgw-8080.app.github.dev/
+

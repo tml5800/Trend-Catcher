@@ -1,54 +1,36 @@
 from fastapi import FastAPI
-from trend_analyzer import get_trends, compare_trends
+from fastapi.middleware.cors import CORSMiddleware
+
+from trend_catcher.backend.trend_analyzer import get_trends, compare_trends
+from trend_catcher.backend.trend_predictor import predict_trend_growth
 
 app = FastAPI()
 
-@app.get("/")
-def root():
-    return {"message": "Trend Catchers Backend Running"}
-
-@app.get("/trends")
-def trends():
-    return get_trends()
-
-@app.get("/compare")
-def compare():
-    return compare_trends()
-
-
-
-from fastapi import FastAPI
-from trend_analyzer import get_trends, compare_trends
-
-from fastapi.middleware.cors import CORSMiddleware
-
+# CORS middleware setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # <-- or list specific frontend URLs
+    allow_origins=["*"],  # ← Replace with your frontend URL for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-app = FastAPI()
-
+# Root health check
 @app.get("/")
 def root():
     return {"message": "Trend Catchers Backend Running"}
 
+# GET: /trends
 @app.get("/trends")
 def trends():
     return get_trends()
 
+# GET: /compare
 @app.get("/compare")
 def compare():
     return compare_trends()
 
-
-from trend_predictor import predict_trend_growth
-
-
+# POST: /predict
 @app.post("/predict")
 def predict_growth(data: dict):
     view_counts = data.get("views", [])
