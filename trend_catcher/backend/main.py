@@ -9,7 +9,9 @@ app = FastAPI()
 # CORS middleware setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ← Replace with your frontend URL for production
+    allow_origins=[
+        "https://verbose-waffle-v6q6wjpxg5x4fxwgw-8080.app.github.dev"
+    ],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

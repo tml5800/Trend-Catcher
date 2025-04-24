@@ -1,0 +1,10 @@
+FROM python:3.12
+
+WORKDIR /app
+
+# Correctly copy the entire project into the container
+COPY . .
+
+RUN pip install --no-cache-dir -r trend_catcher/backend/requirements.txt
+
+CMD ["uvicorn", "trend_catcher.backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
