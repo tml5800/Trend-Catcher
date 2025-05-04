@@ -12,95 +12,56 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 1.5s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
       color: #2c3e50;
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
     }
 
     .container {
-      background: #ffffff;
+      background: white;
       padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      width: 80%;
-      max-width: 700px;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    .button-group {
-      margin-bottom: 1rem;
-    }
-
-    button {
-      margin: 0.4rem;
-      padding: 0.6rem 1.4rem;
-      border: none;
-      background: linear-gradient(90deg, #3498db, #9b59b6);
-      color: white;
-      font-weight: bold;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      animation: pulse 0.3s;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1.05); }
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
     }
 
     input[type="text"] {
       padding: 0.5rem;
-      width: 60%;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      margin-top: 1rem;
-      margin-bottom: 1rem;
       font-size: 1rem;
-      transition: box-shadow 0.3s ease;
+      width: 70%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 1rem;
     }
 
-    input[type="text"]:focus {
-      box-shadow: 0 0 10px #9b59b6;
-      outline: none;
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-left: 0.5rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
     }
 
-    #result {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      background: #f9f9f9;
-      border-left: 5px solid #8e44ad;
-      border-radius: 8px;
-      font-family: monospace;
-      white-space: pre-wrap;
-      text-align: left;
-      animation: slideUp 0.5s ease;
+    button:hover {
+      background-color: #2980b9;
     }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    label {
-      font-weight: bold;
-      display: block;
+    #results {
       margin-top: 1rem;
+      text-align: left;
+    }
+
+    .trend {
+      padding: 0.5rem;
+      border-bottom: 1px solid #eee;
     }
   </style>
 </head>
@@ -108,25 +69,16 @@
 
   <h1>📊 Trend Catchers</h1>
   <div class="container">
-    <div class="button-group">
-      <button onclick="getTrends()">Get Trends</button>
-      <button onclick="getComparison()">Compare Trends</button>
-    </div>
-
-    <label for="viewsInput">Enter Views (comma-separated):</label>
-    <input type="text" id="viewsInput" placeholder="e.g. 1000,1500,2000" />
-    <button onclick="predictGrowth()">Predict</button>
-
-    <div id="result"></div>
+    <input type="text" id="topicInput" placeholder="Enter a topic like food, fashion..." />
+    <button onclick="searchTrends()">Search</button>
+    <div id="results"></div>
   </div>
 
   <script>
     // Make sure to update this to your backend URL!
-    #const BASE_URL = "https://verbose-waffle-v6q6wjpxg5x4fxwgw-8000.app.github.dev";
-    const BASE_URL = "https://www.reddit.com/r/popular/top.json?t=month&limit=50";
+    const BASE_URL = "https://verbose-waffle-v6q6wjpxg5x4fxwgw-8000.app.github.dev";
 
-
-    async function get_Trends() {
+    async function getTrends() {
       try {
         const res = await fetch(`${BASE_URL}/trends`);
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -138,7 +90,7 @@
       }
     }
 
-    async function get_Comparison() {
+    async function getComparison() {
       try {
         const res = await fetch(`${BASE_URL}/compare`);
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -154,23 +106,30 @@
       const input = document.getElementById("viewsInput").value;
       const views = input.split(',').map(Number);
 
-      if (views.some(isNaN)) {
-        document.getElementById("result").textContent = "⚠️ Please enter valid numbers separated by commas.";
+      if (!topic) {
+        resultsBox.innerHTML = "<p>⚠️ Please enter a topic.</p>";
         return;
       }
 
       try {
-        const res = await fetch(`${BASE_URL}/predict`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ views })
-        });
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const res = await fetch(`${BASE_URL}/trends`);
         const data = await res.json();
-        document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+        const filtered = data.trends.filter(t => t.hashtag.toLowerCase().includes(topic));
+
+        console.log("Matching Trends:", filtered); // for debugging
+
+        if (filtered.length === 0) {
+          resultsBox.innerHTML = `<p>❌ No trends found for "${topic}".</p>`;
+        } else {
+          filtered.slice(0, 5).forEach(trend => {
+            resultsBox.innerHTML += `
+              <div class="trend">🔥 <strong>${trend.hashtag}</strong> - ${trend.views.toLocaleString()} views</div>
+            `;
+          });
+        }
       } catch (error) {
-        console.error("Error predicting growth:", error);
-        document.getElementById("result").textContent = "⚠️ Failed to predict growth. Check if the backend is running.";
+        console.error("Fetch error:", error);
+        resultsBox.innerHTML = "<p>⚠️ Failed to load trends. Make sure the backend is running.</p>";
       }
     }
   </script>
